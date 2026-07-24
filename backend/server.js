@@ -12,17 +12,26 @@ import {
 } from "./controllers/productControllers.js";
 
 const app = express();
+dotenv.config({ path: "./config.env" });
 const PORT = process.env.PORT || 5000;
-
+console.log("Connection String is This: ", process.env.MONGODB_URI);
+console.log("Port Numberis This: ", process.env.PORT);
 // Middleware
 app.use(cors());
 app.use(express.json());
 
-// MongoDB Connection
 mongoose
-  .connect(process.env.MONGODB_URI || "mongodb://localhost:27017/ecommerce")
-  .then(() => console.log("MongoDB connected"))
-  .catch((err) => console.log("MongoDB connection error:", err));
+  .connect(process.env.MONGODB_URI)
+  .then(() => {
+    console.log("✅ MongoDB Connected");
+
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error("❌ MongoDB Connection Error:", err.message);
+  });
 
 // CRUD Routes
 // CREATE
@@ -39,5 +48,3 @@ app.put("/api/products/:id", updateProduct);
 
 // DELETE
 app.delete("/api/products/:id", deleteProduct);
-
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
